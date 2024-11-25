@@ -1,0 +1,3 @@
+Category: User Expense, Amount: $100.0
+Category: User Expense, Amount: $200.0
+Category: User Expense, Amount: $2000.0

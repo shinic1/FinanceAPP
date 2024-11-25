@@ -1,0 +1,3 @@
+Source: User Income, Amount: $150.0
+Source: User Income, Amount: $1000.0
+Source: User Income, Amount: $20000.0
