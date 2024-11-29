@@ -1,9 +1,9 @@
 package FinanceApplication;
 
 public class Expense {
-  
-    private String source;  // Source of the expense
-    private double amount;  // Amount of the expense
+
+    private String source; // Source of the expense
+    private double amount; // Amount of the expense
 
     // Constructor to initialize expense with source and amount
     public Expense(String source, double amount) {

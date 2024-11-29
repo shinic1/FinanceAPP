@@ -34,7 +34,8 @@ public class Budget {
     public void addExpense(Expense expense) {
         expenses.add(expense);
         // Add formatted expense entry to expenseHistory
-        expenseHistory.add("Category: " + expense.getSource() + ", Amount: $" + String.format("%.2f", expense.getAmount()));
+        expenseHistory
+                .add("Category: " + expense.getSource() + ", Amount: $" + String.format("%.2f", expense.getAmount()));
     }
 
     public List<Income> getIncomes() {
@@ -65,8 +66,8 @@ public class Budget {
     public ObservableList<String> getExpenseHistory() {
         return expenseHistory;
     }
-    
- // Save budget data to a file
+
+    // Save budget data to a file
     public void saveToFile(String fileName) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {
             oos.writeObject(incomeHistory);

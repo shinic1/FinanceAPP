@@ -17,12 +17,18 @@ import java.io.IOException;
 
 public class DashboardController {
 
-    @FXML private Label totalIncomeLabel;
-    @FXML private Label totalExpensesLabel;
-    @FXML private Label netBalanceLabel;
-    @FXML private ListView<String> incomeListView;
-    @FXML private ListView<String> expenseListView;
-    @FXML private PieChart budgetPieChart;
+    @FXML
+    private Label totalIncomeLabel;
+    @FXML
+    private Label totalExpensesLabel;
+    @FXML
+    private Label netBalanceLabel;
+    @FXML
+    private ListView<String> incomeListView;
+    @FXML
+    private ListView<String> expenseListView;
+    @FXML
+    private PieChart budgetPieChart;
 
     private Budget budget = new Budget(); // Initialize a new Budget object
     @FXML
@@ -34,7 +40,8 @@ public class DashboardController {
     }
 
     public void updateDashboard() {
-        if (budget == null) return;
+        if (budget == null)
+            return;
 
         totalIncomeLabel.setText("$" + budget.getTotalIncome());
         totalExpensesLabel.setText("$" + budget.getTotalExpenses());
@@ -50,10 +57,13 @@ public class DashboardController {
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         double totalIncome = budget.getTotalIncome();
         double totalExpenses = budget.getTotalExpenses();
-        if (totalIncome > 0) pieChartData.add(new PieChart.Data("Income", totalIncome));
-        if (totalExpenses > 0) pieChartData.add(new PieChart.Data("Expenses", totalExpenses));
+        if (totalIncome > 0)
+            pieChartData.add(new PieChart.Data("Income", totalIncome));
+        if (totalExpenses > 0)
+            pieChartData.add(new PieChart.Data("Expenses", totalExpenses));
         budgetPieChart.setData(pieChartData);
     }
+
     private void loadView(String fxmlFile, String title) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
@@ -64,6 +74,7 @@ public class DashboardController {
             showError("Unable to load " + title + " view.");
         }
     }
+
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -76,11 +87,11 @@ public class DashboardController {
     public void handleRefresh() {
         updateDashboard();
     }
+
     @FXML
     public void goToDictionary() {
         loadView("Dictionary.fxml", "Financial Dictionary");
     }
-
 
     @FXML
     public void handleBack() {

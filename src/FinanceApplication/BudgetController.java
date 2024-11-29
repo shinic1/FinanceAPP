@@ -148,7 +148,7 @@ public class BudgetController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
+
     @FXML
     public void handleSave() {
         if (budget == null) {
