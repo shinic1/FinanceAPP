@@ -13,7 +13,8 @@ public class Dashboard extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("Dashboard.fxml"));
+        // Use explicit resource loading
+        FXMLLoader loader = new FXMLLoader(Dashboard.class.getResource("Dashboard.fxml"));
         Parent root = loader.load();
 
         // Get the controller instance and set up the budget

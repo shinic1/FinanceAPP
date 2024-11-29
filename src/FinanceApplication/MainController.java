@@ -16,40 +16,56 @@ import java.util.List;
 public class MainController {
 
     @FXML
-    private TextField incomeField; // TextField for user to input income
+    private TextField incomeField; // Input field for income
     @FXML
-    private TextField expenseField; // TextField for user to input expenses
+    private TextField expenseField; // Input field for expenses
     @FXML
-    private Label resultLabel; // Label to display the result of budget calculation
+    private Label resultLabel; // Label to display the budget calculation result
 
-    private List<Income> incomes = new ArrayList<>(); // List to store Income objects
-    private List<Expense> expenses = new ArrayList<>(); // List to store Expense objects
+    private List<Income> incomes = new ArrayList<>(); // List to store income records
+    private List<Expense> expenses = new ArrayList<>(); // List to store expense records
 
-    private static final String DATA_FILE = "userData.dat"; // File for persistent storage
+    private static final String DATA_FILE = "userData.dat"; // File for persistent storage of data
 
-    // Method to handle budget calculation
+    /**
+     * Called automatically when the controller is loaded.
+     * Loads saved data and updates the result label with the last calculated budget if available.
+     */
+    
+    @FXML
+    public void initialize() {
+        loadData(); // Load saved data into incomes and expenses lists
+        updateResultLabel(); // Update the result label based on loaded data
+    }
+
+    /**
+     * Handles the calculation of the remaining budget based on user input.
+     * Validates the input, updates the result label, and saves the data.
+     */
     @FXML
     public void handleCalculateBudget() {
         try {
-            double income = Double.parseDouble(incomeField.getText());
-            double expense = Double.parseDouble(expenseField.getText());
-            double remainingBudget = income - expense;
+            // Parse user input
+            double income = Double.parseDouble(incomeField.getText().trim());
+            double expense = Double.parseDouble(expenseField.getText().trim());
 
+            // Calculate remaining budget
+            double remainingBudget = income - expense;
             resultLabel.setText(String.format("$%.2f", remainingBudget));
 
-            Income newIncome = new Income("User Income", income);
-            Expense newExpense = new Expense("User Expense", expense);
-            incomes.add(newIncome);
-            expenses.add(newExpense);
-
-            saveData(); // Save updated data to the file
+            // Save data
+            incomes.add(new Income("User Income", income));
+            expenses.add(new Expense("User Expense", expense));
+            saveData();
 
         } catch (NumberFormatException e) {
             showError("Please enter valid numeric values for income and expenses.");
         }
     }
 
-    // Method to clear input fields
+    /**
+     * Clears the input fields and resets the result label.
+     */
     @FXML
     public void handleClearFields() {
         incomeField.clear();
@@ -57,38 +73,60 @@ public class MainController {
         resultLabel.setText("-");
     }
 
-    // Load data from the file when the application starts
-    @FXML
-    public void initialize() {
-        loadData(); // Load saved data into incomes and expenses lists
-        updateResultLabel(); // Update the result label with the last calculated budget if available
-    }
-
-    // Save data to the file
+    /**
+     * Saves the incomes and expenses data to a file for persistent storage.
+     */
     private void saveData() {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(DATA_FILE))) {
-            out.writeObject(incomes);
-            out.writeObject(expenses);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE))) {
+            for (Income income : incomes) {
+                writer.write("INCOME," + income.getSource() + "," + income.getAmount());
+                writer.newLine();
+            }
+            for (Expense expense : expenses) {
+                writer.write("EXPENSE," + expense.getSource() + "," + expense.getAmount());
+                writer.newLine();
+            }
+            System.out.println("Data saved: " + incomes.size() + " incomes and " + expenses.size() + " expenses.");
         } catch (IOException e) {
             showError("Failed to save user data.");
+            e.printStackTrace();
         }
     }
 
-    // Load data from the file
-    @SuppressWarnings("unchecked")
     private void loadData() {
         File file = new File(DATA_FILE);
         if (file.exists()) {
-            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-                incomes = (List<Income>) in.readObject();
-                expenses = (List<Expense>) in.readObject();
-            } catch (IOException | ClassNotFoundException e) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                incomes.clear();
+                expenses.clear();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length == 3) {
+                        String type = parts[0];
+                        String source = parts[1];
+                        double amount = Double.parseDouble(parts[2]);
+                        if ("INCOME".equals(type)) {
+                            incomes.add(new Income(source, amount));
+                        } else if ("EXPENSE".equals(type)) {
+                            expenses.add(new Expense(source, amount));
+                        }
+                    }
+                }
+                System.out.println("Data loaded: " + incomes.size() + " incomes and " + expenses.size() + " expenses.");
+            } catch (IOException | NumberFormatException e) {
                 showError("Failed to load user data.");
+                e.printStackTrace();
             }
+        } else {
+            System.out.println("Data file not found, starting with empty data.");
         }
     }
 
-    // Update the result label with the last calculated budget
+
+    /**
+     * Updates the result label to show the last calculated budget if data is available.
+     */
     private void updateResultLabel() {
         if (!incomes.isEmpty() && !expenses.isEmpty()) {
             double lastIncome = incomes.get(incomes.size() - 1).getAmount();
@@ -99,19 +137,26 @@ public class MainController {
         }
     }
 
-    // Generic method to load different FXML views
+    /**
+     * Loads a new FXML view into the main stage.
+     *
+     * @param fxmlFile The FXML file path for the view.
+     * @param title    The title for the new view.
+     */
     private void loadView(String fxmlFile, String title) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
-            Stage primaryStage = (Stage) incomeField.getScene().getWindow(); // Reuse the main stage
+            Stage primaryStage = (Stage) incomeField.getScene().getWindow(); // Get the main stage
             primaryStage.setScene(new Scene(root));
             primaryStage.setTitle(title);
         } catch (IOException e) {
             showError("Unable to load " + title + " view.");
+            e.printStackTrace(); // Print the stack trace for debugging
         }
     }
 
     // Navigation methods
+
     @FXML
     public void goToBudget() {
         loadView("Budget.fxml", "Manage Budget");
@@ -136,8 +181,13 @@ public class MainController {
     public void goToDashboard() {
         loadView("Dashboard.fxml", "Dashboard");
     }
-
-    // Helper method to show error alerts
+    
+    @FXML
+    public void goToSettings() {
+    	loadView("Settings.fxml", "Settings");
+    }
+    
+ 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -145,4 +195,6 @@ public class MainController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    
+    
 }

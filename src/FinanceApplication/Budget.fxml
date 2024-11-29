@@ -7,7 +7,7 @@
 
 <GridPane fx:id="grid" alignment="center" hgap="20" vgap="20" xmlns:fx="http://javafx.com/fxml"
           fx:controller="FinanceApplication.BudgetController" 
-          style="-fx-padding: 30; -fx-pref-width: 800px; -fx-pref-height: 800px; -fx-background-color: #121212;">
+          style="-fx-padding: 30; -fx-background-color: #121212;">
     
     <!-- Title -->
     <Label text="Total Budget" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #BB86FC;" 

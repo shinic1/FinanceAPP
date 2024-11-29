@@ -11,7 +11,7 @@ public class DataStorage {
 
     public static void saveIncomeData(List<Income> incomes) {
         String filePath = Paths.get("income_data.txt").toAbsolutePath().toString();
-        boolean append = Files.exists(Paths.get(filePath));
+        boolean append = Files.exists(Paths.get(filePath)); 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, append))) {
             for (Income income : incomes) {
                 writer.write("Source: " + income.getSource() + ", Amount: $" + income.getAmount());
@@ -25,7 +25,7 @@ public class DataStorage {
 
     public static void saveExpenseData(List<Expense> expenses) {
         String filePath = Paths.get("expense_data.txt").toAbsolutePath().toString();
-        boolean append = Files.exists(Paths.get(filePath));
+        boolean append = Files.exists(Paths.get(filePath));  
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, append))) {
             for (Expense expense : expenses) {
                 writer.write("Category: " + expense.getSource() + ", Amount: $" + expense.getAmount());

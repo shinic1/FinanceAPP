@@ -1,52 +1,54 @@
 package FinanceApplication;
 
-import javafx.fxml.FXML;
-import javafx.scene.chart.PieChart;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-
-import java.io.IOException;
+import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.stage.Stage;
 
 public class DashboardController {
 
-    @FXML
-    private Label totalIncomeLabel;
-    @FXML
-    private Label totalExpensesLabel;
-    @FXML
-    private Label netBalanceLabel;
-    @FXML
-    private ListView<String> incomeListView;
-    @FXML
-    private ListView<String> expenseListView;
-    @FXML
-    private PieChart budgetPieChart;
+    @FXML private Label totalIncomeLabel;
+    @FXML private Label totalExpensesLabel;
+    @FXML private Label netBalanceLabel;
+    @FXML private ListView<String> incomeListView;
+    @FXML private ListView<String> expenseListView;
+    @FXML private PieChart budgetPieChart;
 
-    private Budget budget = new Budget(); // Initialize a new Budget object
-    @FXML
-    private TextField incomeField;
+    private Budget budget;
 
-    public void setBudget(Budget budget) {
-        this.budget = budget;
-        updateDashboard(); // Initial update with the provided budget data
+    @FXML
+    public void initialize() {
+        // Any initialization you need goes here, or it can be done after calling setBudget
     }
 
-    public void updateDashboard() {
-        if (budget == null)
+    /**
+     * Sets the budget instance and updates the dashboard UI.
+     *
+     * @param budget The Budget object to set for this controller.
+     */
+    public void setBudget(Budget budget) {
+        if (budget == null) {
+            // Handle error or return early
             return;
+        }
+        this.budget = budget;
+        updateDashboard();
+    }
 
-        totalIncomeLabel.setText("$" + budget.getTotalIncome());
-        totalExpensesLabel.setText("$" + budget.getTotalExpenses());
-        netBalanceLabel.setText("$" + budget.getNetBalance());
+    private void updateDashboard() {
+        if (budget == null) return;
 
+        totalIncomeLabel.setText("$" + String.format("%.2f", budget.getTotalIncome()));
+        totalExpensesLabel.setText("$" + String.format("%.2f", budget.getTotalExpenses()));
+        netBalanceLabel.setText("$" + String.format("%.2f", budget.getNetBalance()));
+
+        // Updating ListViews
         incomeListView.setItems(FXCollections.observableArrayList(budget.getIncomeHistory()));
         expenseListView.setItems(FXCollections.observableArrayList(budget.getExpenseHistory()));
 
@@ -57,30 +59,20 @@ public class DashboardController {
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         double totalIncome = budget.getTotalIncome();
         double totalExpenses = budget.getTotalExpenses();
-        if (totalIncome > 0)
+
+        if (totalIncome > 0) {
             pieChartData.add(new PieChart.Data("Income", totalIncome));
-        if (totalExpenses > 0)
-            pieChartData.add(new PieChart.Data("Expenses", totalExpenses));
-        budgetPieChart.setData(pieChartData);
-    }
-
-    private void loadView(String fxmlFile, String title) {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
-            Stage primaryStage = (Stage) incomeField.getScene().getWindow(); // Reuse the main stage
-            primaryStage.setScene(new Scene(root));
-            primaryStage.setTitle(title);
-        } catch (IOException e) {
-            showError("Unable to load " + title + " view.");
         }
-    }
+        if (totalExpenses > 0) {
+            pieChartData.add(new PieChart.Data("Expenses", totalExpenses));
+        }
 
-    private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        // If both income and expenses are zero, display a message or handle accordingly
+        if (pieChartData.isEmpty()) {
+            pieChartData.add(new PieChart.Data("No Data", 1)); // Show "No Data" if both income and expenses are 0
+        }
+
+        budgetPieChart.setData(pieChartData);
     }
 
     @FXML
@@ -89,22 +81,13 @@ public class DashboardController {
     }
 
     @FXML
-    public void goToDictionary() {
-        loadView("Dictionary.fxml", "Financial Dictionary");
-    }
-
-    @FXML
     public void handleBack() {
         try {
-            // Load the main menu scene (MainMenu.fxml) when the back button is clicked
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FinanceApplication/Main.fxml"));
             Parent mainMenuRoot = loader.load();
             Scene mainMenuScene = new Scene(mainMenuRoot);
-
-            // Set the main menu scene on the primary stage
             Stage primaryStage = (Stage) budgetPieChart.getScene().getWindow();
             primaryStage.setScene(mainMenuScene);
-            primaryStage.setTitle("Main Menu"); // Optional: set the title to "Main Menu"
         } catch (Exception e) {
             e.printStackTrace();
         }
